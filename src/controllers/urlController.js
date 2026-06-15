@@ -75,7 +75,46 @@ const getOriginalUrl = async (req, res) => {
     }
 };
 
+const updateShortUrl = async (req, res) => {
+  try {
+    const { shortCode } = req.params;
+    const { url } = req.body;
+
+    if (!url) {
+      return res.status(400).json({
+        message: "URL is required",
+      });
+    }
+
+    if (!isValidUrl(url)) {
+      return res.status(400).json({
+        message: "Please provide a valid URL",
+      });
+    }
+
+    const updatedUrl = await Url.findOneAndUpdate(
+      { shortCode },
+      { url },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUrl) {
+      return res.status(404).json({
+        message: "Short URL not found",
+      });
+    }
+
+    res.status(200).json(updatedUrl);
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
     createShortUrl,
     getOriginalUrl,
+    updateShortUrl,
 };
