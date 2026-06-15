@@ -134,9 +134,31 @@ const deleteShortUrl = async (req, res) => {
   }
 };
 
+const getUrlStats = async (req, res) => {
+  try {
+    const { shortCode } = req.params;
+
+    const urlData = await Url.findOne({ shortCode });
+
+    if (!urlData) {
+      return res.status(404).json({
+        message: "Short URL not found",
+      });
+    }
+
+    res.status(200).json(urlData);
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
     createShortUrl,
     getOriginalUrl,
     updateShortUrl,
     deleteShortUrl,
+    getUrlStats,
 };
